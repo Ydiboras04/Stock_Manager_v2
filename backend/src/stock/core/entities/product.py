@@ -48,4 +48,4 @@ class Product:
         self.quantity -= quantity
 
     def needs_replenishment(self) -> bool:
-        return self.available <= self.min_quantity
+        return self.available < self.min_quantity
