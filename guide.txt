@@ -1,0 +1,104 @@
+STOCK MANAGEMENT - START GUIDE
+==============================
+
+All paths are relative to the project folder (Stock_Management/).
+
+
+OPTION A - EVERYTHING WITH DOCKER (simplest)
+--------------------------------------------
+
+Start database + backend + frontend:
+
+    docker compose up --build -d
+
+Create the users (only the first time):
+
+    docker compose exec backend python -m stock.seed alice secret STOCK_MANAGER
+    docker compose exec backend python -m stock.seed bob secret PURCHASING_MANAGER
+
+Open:
+    Frontend  http://localhost:5173
+    API docs  http://localhost:8000/docs
+
+Stop:
+
+    docker compose down          (keeps the data)
+    docker compose down -v       (also deletes the database)
+
+Start again later (no code changes):
+
+    docker compose up -d
+
+After changing the code, rebuild and restart:
+
+    docker compose up --build -d              (everything)
+    docker compose up --build -d backend      (only the backend)
+    docker compose up --build -d frontend     (only the frontend)
+
+Database migrations run automatically when the backend starts.
+
+Check what is running / see the logs:
+
+    docker compose ps
+    docker compose logs -f backend
+
+
+OPTION B - RUN BACKEND AND FRONTEND YOURSELF (development)
+----------------------------------------------------------
+
+If the Docker stack is running, stop its backend and frontend first,
+they use the same ports (8000 and 5173):
+
+    docker compose stop backend frontend
+
+
+1. Database (PostgreSQL in Docker, port 5433)
+
+    docker compose up -d db
+
+
+2. Backend (terminal 1)
+
+First time only:
+
+    cd backend
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+
+Every time:
+
+    cd backend
+    source .venv/bin/activate
+    export DATABASE_URL=postgresql+psycopg://stock:stock@localhost:5433/stock
+    alembic upgrade head
+    uvicorn stock.api.main:app --reload
+
+Create the users (first time only, with the same DATABASE_URL):
+
+    python -m stock.seed alice secret STOCK_MANAGER
+    python -m stock.seed bob secret PURCHASING_MANAGER
+
+Backend: http://localhost:8000  (docs: http://localhost:8000/docs)
+
+
+3. Frontend (terminal 2)
+
+First time only:
+
+    cd frontend
+    npm install
+
+Every time:
+
+    cd frontend
+    npm run dev
+
+Frontend: http://localhost:5173
+
+
+LOGIN
+-----
+
+    alice / secret   stock manager
+    bob   / secret   purchasing manager

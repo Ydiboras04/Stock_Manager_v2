@@ -1,0 +1,20 @@
+# Install with: pip install -r requirements.txt
+
+# --- Runtime ---
+fastapi==0.143.2
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.4
+psycopg[binary]==3.3.6
+alembic==1.20.0
+PyJWT==2.15.1
+bcrypt==5.0.0
+python-multipart==0.0.32
+
+# --- Tests & lint ---
+pytest==9.1.1
+pytest-cov==7.1.0
+httpx==0.28.1
+ruff==0.17.1
+
+# --- This project (makes the `stock` package importable) ---
+-e .
